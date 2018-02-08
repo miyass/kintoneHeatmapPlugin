@@ -1,0 +1,37 @@
+.map {
+  position: relative;
+  height: 1000px;
+}
+
+.japan {
+  position: absolute;
+  top: 0;
+  left: 15%;
+}
+
+.mapViewTitle {
+  font-size: 40px;
+  font-weight: bold;
+  padding-left: 40px;
+}
+
+.recordInfo {
+  font-size: 25px;
+  font-weight: bold;
+  padding-left: 40px;
+}
+
+.prefLists {
+  list-style: none;
+  padding-left: 40px;
+}
+
+.prefList1,.prefList2,.prefList3,.prefList4,.prefList5 {
+  float: left;
+  list-style: none;
+}
+
+.pref {
+  font-size: 13px;
+  /* float: left; */
+}

@@ -1,0 +1,36 @@
+{
+  "manifest_version": 1,
+  "version": 1,
+  "type": "APP",
+  "name": {
+      "ja": "ヒートマッププラグイン",
+      "en": "Heatmap Plug-in"
+  },
+  "description": {
+    "ja": "都道府県別のレコードの数をヒートマップで可視化するプラグインです。",
+    "en": "This plugin checks zip code, telephone number, FAX number, e-mail address"
+  },
+  "icon": "img/icon.png",
+  "desktop": {
+    "js":[
+      "https://d3js.org/d3.v4.min.js",
+      "https://unpkg.com/topojson-client@3.0.0/dist/topojson-client.js",
+      "https://unpkg.com/topojson@3.0.2/dist/topojson.js",
+      "js/japanmap.js",
+      "js/mapView.js"
+    ],
+    "css":[
+      "css/mapstyle.css"
+    ]
+  },
+  "config":{
+    "js": [
+      "https://js.cybozu.com/jquery/1.11.1/jquery.min.js",
+      "js/config.js"
+    ],
+    "css": [
+      "css/51-modern-default.css"
+    ],
+    "html": "html/config.html"
+  }
+}
