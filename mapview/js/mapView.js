@@ -4,7 +4,8 @@
   var config = kintone.plugin.app.getConfig(PLUGIN_ID);
   var recordGetBody = {
     "app" : kintone.app.getId(),
-    "fields" : [config['pref']]
+    "fields" : [config['pref']],
+    "query": "limit 500"
   }
 
   kintone.api(kintone.api.url('/k/v1/records', true), 'GET', recordGetBody, function(resp) {
