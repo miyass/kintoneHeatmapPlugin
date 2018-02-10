@@ -1,51 +1,60 @@
 (function (PLUGIN_ID) {
   'use strict';
 
-  var config = kintone.plugin.app.getConfig(PLUGIN_ID);
-  var recordGetBody = {
-    "app" : kintone.app.getId(),
-    "fields" : [config['pref']],
-    "query": "limit 500"
-  }
-
-  kintone.api(kintone.api.url('/k/v1/records', true), 'GET', recordGetBody, function(resp) {
-
-    mapDraw();
-
-    var title = document.getElementsByClassName('mapViewTitle')[0];
-    title.textContent = "都道府県別ヒートマップ";
-    var recordNumber = resp.records.length;
-    var infoElement = document.getElementsByClassName('recordInfo')[0];
-    infoElement.textContent = "レコード数  " + recordNumber + "個中";
-
-    for(var i = 0; i < recordNumber; i++) {
-      var color = 220;
-      color -= 1;
-      if ( color < 0 ){
-        color = 0;
-      };
-
-      var prefNumber = resp.records[i][config['pref']]['value'];
-      if( prefNumber in japanPref == true ){
-        japanPref[prefNumber] += 1;
-      } else {
-        console.log("fail");
-      }
-      d3.select("." + prefNumber).style("fill", "rgb( 255 ," + color + ", " + color + ")").style("stroke", "#aaa");
+  function getAllRecords(appId, opt_offset ,opt_limit, opt_records) {
+    var config = kintone.plugin.app.getConfig(PLUGIN_ID);
+    var offset = opt_offset || 0;
+    var limit = opt_limit || 500;
+    var allRecords = opt_records || [];
+    var params = {
+      "app": appId,
+      "field": [config['pref']],
+      "query": ' limit ' + limit + ' offset ' + offset
     };
 
-    var count = 2;
-    var ulCount = 1;
-    for( var keys in japanPref ) {
-      var selector = d3.select(".prefList" + ulCount);
-      selector.append("li").attr("class", "pref").text(keys + '  ' + japanPref[keys]);
-      if(count % 10 === 1) {
-        ulCount += 1;
-        selector = d3.select(".prefList" + ulCount);
+    return kintone.api('/k/v1/records', 'GET', params).then(function(resp) {
+      allRecords = allRecords.concat(resp.records);
+      if( resp.records.length === limit ) {
+        return getAllRecords(appId, offset + limit, limit, allRecords);
       }
-      count++;
-    }
-  });
+      mapDraw();
+
+      var title = document.getElementsByClassName('mapViewTitle')[0];
+      title.textContent = "都道府県別ヒートマップ";
+      var recordNumber = allRecords.length;
+      var infoElement = document.getElementsByClassName('recordInfo')[0];
+      infoElement.textContent = "レコード数  " + recordNumber + "個中";
+
+      for(var i = 0; i < recordNumber; i++) {
+        var color = 220;
+
+        var prefNumber = allRecords[i][config['pref']]['value'];
+        if( prefNumber in japanPref == true ){
+          japanPref[prefNumber] += 1;
+        } else {
+          console.log("fail");
+        }
+        var changeColorCode = japanPref[prefNumber];
+        color -= changeColorCode;
+        if ( color < 0 ){
+          color = 0;
+        };
+        d3.select("." + prefNumber).style("fill", "rgb( 255 ," + color + ", " + color + ")").style("stroke", "#aaa");
+      };
+
+      var count = 2;
+      var ulCount = 1;
+      for( var keys in japanPref ) {
+        var selector = d3.select(".prefList" + ulCount);
+        selector.append("li").attr("class", "pref").text(keys + '  ' + japanPref[keys]);
+        if(count % 10 === 1) {
+          ulCount += 1;
+          selector = d3.select(".prefList" + ulCount);
+        }
+        count++;
+      }
+    });
+  }
 
   function mapDraw() {
     var w = 1100;
@@ -59,5 +68,7 @@
       return  d.properties.name_local;
     }).style("fill","#999").attr("d", path);
   }
+
+  getAllRecords(kintone.app.getId());
 
 })(kintone.$PLUGIN_ID);
